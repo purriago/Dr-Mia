@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Control NeoPixel ESP32</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #1e1e1e;
+      color: #fff;
+      padding: 20px;
+    }
+    .color-button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .slider {
+      width: 200px;
+    }
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🎛️ Control NeoPixel - ESP32</h2>
+
+  <label>Dirección IP del ESP32: </label>
+  <input type="text" id="esp32ip" placeholder="Ej: 192.168.196.154" />
+
+  <h3>🎨 Colores predefinidos</h3>
+  <button class="color-button" style="background:red;" onclick="setColor(255,0,0)">Rojo</button>
+  <button class="color-button" style="background:orange;" onclick="setColor(255,165,0)">Naranja</button>
+  <button class="color-button" style="background:yellow; color:black;" onclick="setColor(255,255,0)">Amarillo</button>
+  <button class="color-button" style="background:green;" onclick="setColor(0,255,0)">Verde</button>
+  <button class="color-button" style="background:blue;" onclick="setColor(0,0,255)">Azul</button>
+  <button class="color-button" style="background:purple;" onclick="setColor(128,0,128)">Morado</button>
+  <button class="color-button" style="background:grey;" onclick="setColor(0,0,0)">Apagar</button>
+
+  <h3>💡 LED UV</h3>
+  <button onclick="setUV('on')">Encender UV</button>
+  <button onclick="setUV('off')">Apagar UV</button>
+
+  <h3>🎛️ Personalizado RGB</h3>
+  <label>R:</label><input class="slider" type="range" id="r" min="0" max="255"><br>
+  <label>G:</label><input class="slider" type="range" id="g" min="0" max="255"><br>
+  <label>B:</label><input class="slider" type="range" id="b" min="0" max="255"><br>
+  <button onclick="sendCustomColor()">Aplicar</button>
+
+  <div id="status">Esperando acción...</div>
+
+  <script>
+    function getBaseUrl() {
+      const ip = document.getElementById("esp32ip").value.trim();
+      return `http://${ip}`;
+    }
+
+    function setColor(r, g, b) {
+      const url = `${getBaseUrl()}/color?r=${r}&g=${g}&b=${b}`;
+      fetch(url)
+        .then(response => response.text())
+        .then(data => document.getElementById("status").innerText = "Color enviado: " + data)
+        .catch(err => document.getElementById("status").innerText = "Error al enviar color.");
+    }
+
+    function setUV(state) {
+      const url = `${getBaseUrl()}/uv?state=${state}`;
+      fetch(url)
+        .then(response => response.text())
+        .then(data => document.getElementById("status").innerText = "UV: " + data)
+        .catch(err => document.getElementById("status").innerText = "Error al controlar UV.");
+    }
+
+    function sendCustomColor() {
+      const r = document.getElementById("r").value;
+      const g = document.getElementById("g").value;
+      const b = document.getElementById("b").value;
+      setColor(r, g, b);
+    }
+  </script>
+
+</body>
+</html>
+
